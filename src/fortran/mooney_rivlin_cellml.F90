@@ -412,7 +412,7 @@ PROGRAM MOONEYRIVLININCELLMLEXAMPLE
   CALL cmfe_CellML_Initialise(CellML,Err)
   CALL cmfe_CellML_CreateStart(CellMLUserNumber,Region,CellML,Err)
   !Import a Mooney-Rivlin material law from a file
-  CALL cmfe_CellML_ModelImport(CellML,"mooney_rivlin.xml",MooneyRivlinModelIndex,Err)
+  CALL cmfe_CellML_ModelImport(CellML,"inputs/mooney_rivlin.xml",MooneyRivlinModelIndex,Err)
 !  CALL cmfe_CellML_ModelImport(CellML,"n98.xml",MooneyRivlinModelIndex,Err)
   ! Now we have imported the model we are able to specify which variables from the model we want:
   !   - to set from this side
@@ -561,6 +561,9 @@ PROGRAM MOONEYRIVLININCELLMLEXAMPLE
   CALL cmfe_Solver_OutputTypeSet(Solver,CMFE_SOLVER_PROGRESS_OUTPUT,Err)
   CALL cmfe_Solver_NewtonJacobianCalculationTypeSet(Solver,CMFE_SOLVER_NEWTON_JACOBIAN_FD_CALCULATED,Err)
   CALL cmfe_Solver_NewtonLinearSolverGet(Solver,LinearSolver,Err)
+  CALL cmfe_Solver_NewtonAbsoluteToleranceSet(Solver,1.0E-14_CMISSRP,Err)
+  CALL cmfe_Solver_NewtonSolutionToleranceSet(Solver,1.0E-14_CMISSRP,Err)
+  CALL cmfe_Solver_NewtonRelativeToleranceSet(Solver,1.0E-14_CMISSRP,Err)
   CALL cmfe_Solver_LinearTypeSet(LinearSolver,CMFE_SOLVER_LINEAR_DIRECT_SOLVE_TYPE,Err)
   CALL cmfe_Problem_SolversCreateFinish(Problem,Err)
 
