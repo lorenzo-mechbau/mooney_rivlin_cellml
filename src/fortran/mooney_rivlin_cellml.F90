@@ -543,7 +543,7 @@ PROGRAM MOONEYRIVLININCELLMLEXAMPLE
   !Define the problem
   CALL cmfe_Problem_Initialise(Problem,Err)
   CALL cmfe_Problem_CreateStart(ProblemUserNumber,[CMFE_PROBLEM_ELASTICITY_CLASS,CMFE_PROBLEM_FINITE_ELASTICITY_TYPE, &
-    & CMFE_PROBLEM_FINITE_ELASTICITY_CELLML_SUBTYPE],Problem,Err)
+    & CMFE_PROBLEM_FINITE_ELASTICITY_WITH_CELLML_SUBTYPE],Problem,Err)
    CALL cmfe_Problem_CreateFinish(Problem,Err)
 
   !Create the problem control loop
