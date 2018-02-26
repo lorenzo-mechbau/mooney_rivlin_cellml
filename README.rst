@@ -1,8 +1,8 @@
 ====================
-mooney_rivlin_cellml
+Mooney Rivlin CellML
 ====================
 
-Mooney Rivlin with CellML 
+Finite elasticity example using the Mooney Rivlin constitutive relationship described in CellML.
 
 Building the example
 ====================
@@ -10,29 +10,22 @@ Building the example
 Instructions on how to configure and build with CMake::
 
   git clone https://github.com/OpenCMISS-Examples/mooney_rivlin_cellml.git
-  mkdir build
+  mkdir mooney_rivlin_cellml-build
+  cd mooney_rivlin_cellml-build
   cmake -DOpenCMISSLibs_DIR=/path/to/opencmisslib/install ../mooney_rivlin_cellml
   make  # cmake --build . will also work here and is much more platform agnostic.
 
 Running the example
 ===================
 
-Explain how the example is run::
+To run the example execute the following commands from the build directory::
 
-  cd build
-  ./src/fortran/mooney_rivlin_cellml.F90
-
-or maybe it is a Python only example::
-
-  source /path/to/opencmisslibs/install/virtaul_environments/oclibs_venv_pyXY_release/bin/activate
-  python src/python/mooney_rivlin_cellml.py
-
-where the XY in the path are the Python major and minor versions respectively.
+  ./src/fortran/mooney_rivlin_cellml
 
 Prerequisites
 =============
 
-None
+This example is self-contained and requires no further pre-requisties other than Iron.
 
 License
 =======
