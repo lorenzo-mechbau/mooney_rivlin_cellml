@@ -1,5 +1,5 @@
 !> Main program
-PROGRAM MOONEYRIVLININCELLMLEXAMPLE
+PROGRAM MooneyRivlinInCellMLExample
 
   USE OpenCMISS
   USE OpenCMISS_Iron
@@ -107,7 +107,8 @@ PROGRAM MOONEYRIVLININCELLMLEXAMPLE
   TYPE(cmfe_BasisType) :: QuadraticBasis, LinearBasis, Basis(2)
   TYPE(cmfe_BoundaryConditionsType) :: BoundaryConditions
   TYPE(cmfe_ComputationEnvironmentType) :: computationEnvironment
-  TYPE(cmfe_CoordinateSystemType) :: CoordinateSystem, WorldCoordinateSystem
+  TYPE(cmfe_ContextType) :: context
+  TYPE(cmfe_CoordinateSystemType) :: CoordinateSystem
   TYPE(cmfe_GeneratedMeshType) :: GeneratedMesh
   TYPE(cmfe_MeshType) :: Mesh
   TYPE(cmfe_DecompositionType) :: Decomposition
@@ -175,9 +176,12 @@ PROGRAM MOONEYRIVLININCELLMLEXAMPLE
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   !Intialise cmiss
-  CALL cmfe_Initialise(WorldCoordinateSystem,WorldRegion,Err)
-
-  CALL cmfe_ErrorHandlingModeSet(CMFE_ERRORS_TRAP_ERROR,Err)
+  CALL cmfe_Context_Initialise(context,err)
+  CALL cmfe_Initialise(context,err)
+  CALL cmfe_ErrorHandlingModeSet(CMFE_ERRORS_TRAP_ERROR,err)
+  CALL cmfe_Region_Initialise(worldRegion,err)
+  CALL cmfe_Context_WorldRegionGet(context,worldRegion,err)
+  CALL cmfe_Context_RandomSeedsSet(context,9999,err)
 
   WRITE(*,'(A)') "Program starting."
 
@@ -186,6 +190,7 @@ PROGRAM MOONEYRIVLININCELLMLEXAMPLE
 
   !Get the number of computational nodes and this computational node number
   CALL cmfe_ComputationEnvironment_Initialise(computationEnvironment,err)
+  CALL cmfe_Context_ComputationEnvironmentGet(context,computationEnvironment,err)
   CALL cmfe_ComputationEnvironment_NumberOfWorldNodesGet(computationEnvironment,numberOfComputationalNodes,err)
   CALL cmfe_ComputationEnvironment_WorldNodeNumberGet(computationEnvironment,computationalNodeNumber,err)
 
@@ -201,7 +206,7 @@ PROGRAM MOONEYRIVLININCELLMLEXAMPLE
 
   !Create a CS - default is 3D rectangular cartesian CS with 0,0,0 as origin
   CALL cmfe_CoordinateSystem_Initialise(CoordinateSystem,Err)
-  CALL cmfe_CoordinateSystem_CreateStart(CoordinateSystemUserNumber,CoordinateSystem,Err)
+  CALL cmfe_CoordinateSystem_CreateStart(CoordinateSystemUserNumber,context,CoordinateSystem,Err)
   CALL cmfe_CoordinateSystem_TypeSet(CoordinateSystem,CMFE_COORDINATE_RECTANGULAR_CARTESIAN_TYPE,Err)
   CALL cmfe_CoordinateSystem_DimensionSet(CoordinateSystem,NumberOfSpatialCoordinates,Err)
   CALL cmfe_CoordinateSystem_OriginSet(CoordinateSystem,[0.0_CMISSRP,0.0_CMISSRP,0.0_CMISSRP],Err)
@@ -216,7 +221,7 @@ PROGRAM MOONEYRIVLININCELLMLEXAMPLE
 
   !Define basis functions - tri-Quadratic Lagrange and tri-Linear Lagrange
   CALL cmfe_Basis_Initialise(QuadraticBasis,Err)
-  CALL cmfe_Basis_CreateStart(QuadraticBasisUserNumber,QuadraticBasis,Err)
+  CALL cmfe_Basis_CreateStart(QuadraticBasisUserNumber,context,QuadraticBasis,Err)
   CALL cmfe_Basis_TypeSet(QuadraticBasis,CMFE_BASIS_LAGRANGE_HERMITE_TP_TYPE,Err)
   CALL cmfe_Basis_NumberOfXiSet(QuadraticBasis,NumberOfXiCoordinates,Err)
   CALL cmfe_Basis_InterpolationXiSet(QuadraticBasis,[CMFE_BASIS_QUADRATIC_LAGRANGE_INTERPOLATION, &
@@ -226,7 +231,7 @@ PROGRAM MOONEYRIVLININCELLMLEXAMPLE
   CALL cmfe_Basis_CreateFinish(QuadraticBasis,Err)
 
   CALL cmfe_Basis_Initialise(LinearBasis,Err)
-  CALL cmfe_Basis_CreateStart(LinearBasisUserNumber,LinearBasis,Err)
+  CALL cmfe_Basis_CreateStart(LinearBasisUserNumber,context,LinearBasis,Err)
   CALL cmfe_Basis_TypeSet(LinearBasis,CMFE_BASIS_LAGRANGE_HERMITE_TP_TYPE,Err)
   CALL cmfe_Basis_NumberOfXiSet(LinearBasis,NumberOfXiCoordinates,Err)
   CALL cmfe_Basis_InterpolationXiSet(LinearBasis,[CMFE_BASIS_LINEAR_LAGRANGE_INTERPOLATION, &
@@ -544,7 +549,7 @@ PROGRAM MOONEYRIVLININCELLMLEXAMPLE
 
   !Define the problem
   CALL cmfe_Problem_Initialise(Problem,Err)
-  CALL cmfe_Problem_CreateStart(ProblemUserNumber,[CMFE_PROBLEM_ELASTICITY_CLASS,CMFE_PROBLEM_FINITE_ELASTICITY_TYPE, &
+  CALL cmfe_Problem_CreateStart(ProblemUserNumber,context,[CMFE_PROBLEM_ELASTICITY_CLASS,CMFE_PROBLEM_FINITE_ELASTICITY_TYPE, &
     & CMFE_PROBLEM_FINITE_ELASTICITY_WITH_CELLML_SUBTYPE],Problem,Err)
    CALL cmfe_Problem_CreateFinish(Problem,Err)
 
@@ -654,7 +659,7 @@ PROGRAM MOONEYRIVLININCELLMLEXAMPLE
   CALL cmfe_Fields_ElementsExport(Fields,"./results/MooneyRivlinInCellML","FORTRAN",Err)
   CALL cmfe_Fields_Finalise(Fields,Err)
 
-  CALL cmfe_Finalise(Err)
+  CALL cmfe_Finalise(context,Err)
 
   WRITE(*,'(A)') "Program successfully completed."
 
@@ -676,5 +681,5 @@ CONTAINS
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
-END PROGRAM MOONEYRIVLININCELLMLEXAMPLE
+END PROGRAM MooneyRivlinInCellMLExample
 
