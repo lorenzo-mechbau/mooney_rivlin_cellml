@@ -23,7 +23,7 @@ PROGRAM MOONEYRIVLININCELLMLEXAMPLE
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   INTEGER(CMISSIntg) :: NUMBER_OF_ARGUMENTS,ARGUMENT_LENGTH,STATUS
-  CHARACTER(LEN=255) :: COMMAND_ARGUMENT!,Filename
+  CHARACTER(LEN=255) :: COMMAND_ARGUMENT, filename
 !  INTEGER(CMISSIntg), PARAMETER :: NumberOfElementsInEachDirection=10
   INTEGER(CMISSIntg), PARAMETER :: DependentFieldAutoCreate=1 ! 1=yes   0=no
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -106,7 +106,7 @@ PROGRAM MOONEYRIVLININCELLMLEXAMPLE
 
   TYPE(cmfe_BasisType) :: QuadraticBasis, LinearBasis, Basis(2)
   TYPE(cmfe_BoundaryConditionsType) :: BoundaryConditions
-  TYPE(cmfe_ComputationEnvironmentType) :: computationEnvironment
+  !TYPE(cmfe_ComputationEnvironmentType) :: computationEnvironment
   TYPE(cmfe_CoordinateSystemType) :: CoordinateSystem, WorldCoordinateSystem
   TYPE(cmfe_GeneratedMeshType) :: GeneratedMesh
   TYPE(cmfe_MeshType) :: Mesh
@@ -153,7 +153,7 @@ PROGRAM MOONEYRIVLININCELLMLEXAMPLE
 
   !Get the command arguments
   NUMBER_OF_ARGUMENTS = COMMAND_ARGUMENT_COUNT()
-  IF(NUMBER_OF_ARGUMENTS == 3) THEN
+  IF(NUMBER_OF_ARGUMENTS == 4) THEN
     CALL GET_COMMAND_ARGUMENT(1,COMMAND_ARGUMENT,ARGUMENT_LENGTH,STATUS)
     IF(STATUS>0) CALL HANDLE_ERROR("Error for command argument 1.")
     READ(COMMAND_ARGUMENT(1:ARGUMENT_LENGTH),*) NumberGlobalXElements
@@ -166,10 +166,14 @@ PROGRAM MOONEYRIVLININCELLMLEXAMPLE
     IF(STATUS>0) CALL HANDLE_ERROR("Error for command argument 3.")
     READ(COMMAND_ARGUMENT(1:ARGUMENT_LENGTH),*) NumberGlobalZElements
     IF(NumberGlobalZElements<0) CALL HANDLE_ERROR("Invalid number of Z elements.")
+    CALL GET_COMMAND_ARGUMENT(4,COMMAND_ARGUMENT,ARGUMENT_LENGTH,STATUS)
+    IF(status>0) CALL HANDLE_ERROR("Error for command argument 4.")
+    filename = trim(COMMAND_ARGUMENT)//"inputs/mooney_rivlin.xml"
   ELSE
     NumberGlobalXElements=1
     NumberGlobalYElements=1
     NumberGlobalZElements=1
+    CALL Handle_Error("Needed path to input file!!!")
   ENDIF
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -184,10 +188,12 @@ PROGRAM MOONEYRIVLININCELLMLEXAMPLE
   !Set all diganostic levels on for testing
 !  CALL cmfe_DiagnosticsSetOn(CMFE_FROM_DIAG_TYPE,[1,2,3,4,5],"Diagnostics",["PROBLEM_FINITE_ELEMENT_CALCULATE"],Err)
 
-  !Get the number of computational nodes and this computational node number
-  CALL cmfe_ComputationEnvironment_Initialise(computationEnvironment,err)
-  CALL cmfe_ComputationEnvironment_NumberOfWorldNodesGet(computationEnvironment,numberOfComputationalNodes,err)
-  CALL cmfe_ComputationEnvironment_WorldNodeNumberGet(computationEnvironment,computationalNodeNumber,err)
+  !Get the computational nodes information
+  !CALL cmfe_ComputationEnvironment_Initialise(computationEnvironment,err)
+  !CALL cmfe_ComputationEnvironment_NumberOfWorldNodesGet(computationEnvironment,numberOfComputationalNodes,err)
+  !CALL cmfe_ComputationEnvironment_WorldNodeNumberGet(computationEnvironment,computationalNodeNumber,err)
+  CALL cmfe_ComputationalNumberOfNodesGet(NumberOfComputationalNodes,Err)
+  CALL cmfe_ComputationalNodeNumberGet(ComputationalNodeNumber,Err)
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -414,7 +420,7 @@ PROGRAM MOONEYRIVLININCELLMLEXAMPLE
   CALL cmfe_CellML_Initialise(CellML,Err)
   CALL cmfe_CellML_CreateStart(CellMLUserNumber,Region,CellML,Err)
   !Import a Mooney-Rivlin material law from a file
-  CALL cmfe_CellML_ModelImport(CellML,"inputs/mooney_rivlin.xml",MooneyRivlinModelIndex,Err)
+  CALL cmfe_CellML_ModelImport(CellML,filename,MooneyRivlinModelIndex,Err)
 !  CALL cmfe_CellML_ModelImport(CellML,"n98.xml",MooneyRivlinModelIndex,Err)
   ! Now we have imported the model we are able to specify which variables from the model we want:
   !   - to set from this side
